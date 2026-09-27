@@ -1,0 +1,17 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+
+[*.cs]
+indent_size = 4
+
+[*.{json,csproj,props,xml}]
+indent_size = 2
+
+# EF Core migrations are generated code.
+[**/Migrations/*.cs]
+generated_code = true
