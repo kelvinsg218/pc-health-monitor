@@ -393,19 +393,19 @@
                 </StackPanel>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" MinWidth="380" />
-                        <ColumnDefinition Width="*" MinWidth="280" />
+                        <ColumnDefinition Width="5*" MinWidth="380" />
+                        <ColumnDefinition Width="3*" MinWidth="280" />
                     </Grid.ColumnDefinitions>
                     <Border Style="{StaticResource Card}">
-                        <DataGrid ItemsSource="{Binding Scans}" SelectedItem="{Binding Selected}">
+                        <DataGrid ItemsSource="{Binding Scans}" SelectedItem="{Binding Selected}" HorizontalScrollBarVisibility="Disabled">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="0.5*" MinWidth="36" />
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="0.5*" MinWidth="30" />
                                 <DataGridTextColumn Header="DATA" Binding="{Binding Date}" Width="1.8*" MinWidth="122" />
-                                <DataGridTextColumn Header="CPU MÉD." Binding="{Binding CpuAverage}" Width="*" MinWidth="64" />
-                                <DataGridTextColumn Header="PICO" Binding="{Binding CpuPeak}" Width="*" MinWidth="58" />
-                                <DataGridTextColumn Header="MEMÓRIA" Binding="{Binding Memory}" Width="*" MinWidth="66" />
-                                <DataGridTextColumn Header="DISCO MÁX." Binding="{Binding DiskMax}" Width="1.3*" MinWidth="80" />
-                                <DataGridTemplateColumn Header="SAÚDE" Width="1.4*" MinWidth="98">
+                                <DataGridTextColumn Header="CPU MÉD." Binding="{Binding CpuAverage}" Width="*" MinWidth="74" />
+                                <DataGridTextColumn Header="PICO" Binding="{Binding CpuPeak}" Width="*" MinWidth="52" />
+                                <DataGridTextColumn Header="MEMÓRIA" Binding="{Binding Memory}" Width="*" MinWidth="78" />
+                                <DataGridTextColumn Header="DISCO MÁX." Binding="{Binding DiskMax}" Width="1.3*" MinWidth="86" />
+                                <DataGridTemplateColumn Header="SAÚDE" Width="1.4*" MinWidth="84">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ContentPresenter Content="{Binding Health}" ContentTemplate="{StaticResource PillTemplate}" />
