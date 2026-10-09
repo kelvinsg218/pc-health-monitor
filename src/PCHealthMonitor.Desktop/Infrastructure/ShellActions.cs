@@ -19,7 +19,7 @@ public static class ShellActions
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
-            System.Windows.MessageBox.Show($"The folder could not be opened:\n{folder}", "PC Health Monitor",
+            System.Windows.MessageBox.Show($"Não foi possível abrir a pasta:\n{folder}", "PC Health Monitor",
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
         }
     }

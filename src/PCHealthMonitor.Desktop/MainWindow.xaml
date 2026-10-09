@@ -15,7 +15,7 @@
         <!-- Status pill bound to a status label (OK / WARNING / CRITICAL / UNKNOWN / HEALTHY / ATTENTION / INFO) -->
         <DataTemplate x:Key="PillTemplate">
             <Border Style="{StaticResource Pill}" Background="{Binding Converter={StaticResource StatusBrush}, ConverterParameter=soft}">
-                <TextBlock Text="{Binding}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Converter={StaticResource StatusBrush}}" />
+                <TextBlock Text="{Binding Converter={StaticResource StatusText}}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Converter={StaticResource StatusBrush}}" />
             </Border>
         </DataTemplate>
 
@@ -77,10 +77,10 @@
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Bottom" Margin="20,0,16,18">
-                                <TextBlock Text="Read-only diagnostics" Foreground="{StaticResource MutedBrush}" FontSize="11" />
-                                <TextBlock Text="Data stays on this computer" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                                <TextBlock Text="Diagnóstico somente leitura" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                                <TextBlock Text="Os dados ficam neste computador" Foreground="{StaticResource MutedBrush}" FontSize="11" />
                                 <TextBlock Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,6,0,0">
-                                    <Run Text="Version " /><Run Text="{Binding Version, Mode=OneWay}" />
+                                    <Run Text="Versão " /><Run Text="{Binding Version, Mode=OneWay}" />
                                 </TextBlock>
                             </StackPanel>
                             <StackPanel IsItemsHost="True" />
@@ -93,7 +93,7 @@
         </TabControl.Template>
 
         <!-- ===================== DASHBOARD ===================== -->
-        <TabItem Header="Dashboard">
+        <TabItem Header="Painel">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DataContext="{Binding Dashboard}">
                 <StackPanel Margin="22,22,22,22">
 
@@ -103,8 +103,8 @@
                             <TextBlock Text="{Binding Machine}" Style="{StaticResource TitleText}" />
                             <TextBlock Text="{Binding Windows}" Style="{StaticResource MutedText}" Margin="0,2,0,0" />
                             <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0">
-                                <Run Text="Uptime " /><Run Text="{Binding Uptime, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
-                                <Run Text="  ·  Updated " /><Run Text="{Binding LastUpdated, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
+                                <Run Text="Tempo ligado: " /><Run Text="{Binding Uptime, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
+                                <Run Text="  ·  Atualizado às " /><Run Text="{Binding LastUpdated, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
                             </TextBlock>
                             <TextBlock Text="{Binding RefreshText}" Style="{StaticResource MutedText}" FontSize="11" Margin="0,2,0,0" />
                         </StackPanel>
@@ -112,11 +112,11 @@
                         <Border Style="{StaticResource Card}" Margin="6,0"
                                 BorderBrush="{Binding Overall, Converter={StaticResource StatusBrush}}">
                             <StackPanel>
-                                <TextBlock Text="OVERALL HEALTH (LIVE)" Style="{StaticResource SectionText}" Margin="0,0,0,4" />
+                                <TextBlock Text="SAÚDE GERAL (AO VIVO)" Style="{StaticResource SectionText}" Margin="0,0,0,4" />
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Overall}" FontSize="26" FontWeight="SemiBold"
+                                    <TextBlock Text="{Binding Overall, Converter={StaticResource StatusText}}" FontSize="26" FontWeight="SemiBold"
                                                Foreground="{Binding Overall, Converter={StaticResource StatusBrush}}" />
-                                    <TextBlock Text="  incomplete data" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="0,0,0,5"
+                                    <TextBlock Text="  dados incompletos" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="0,0,0,5"
                                                Visibility="{Binding IsIncomplete, Converter={StaticResource BoolToVisibility}}" />
                                 </StackPanel>
                                 <TextBlock Text="{Binding OverallReason}" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0" />
@@ -134,7 +134,7 @@
                     </Border>
                     <Border Style="{StaticResource Card}" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
                         <StackPanel>
-                            <TextBlock Text="Collecting the first measurements…" Margin="0,0,0,10" />
+                            <TextBlock Text="Coletando as primeiras medições…" Margin="0,0,0,10" />
                             <ProgressBar IsIndeterminate="{Binding IsLoading, Mode=OneWay}" />
                         </StackPanel>
                     </Border>
@@ -152,7 +152,7 @@
                                 <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Margin="0,8,0,10"
                                              Foreground="{Binding CpuStatus, Converter={StaticResource StatusBrush}}" />
                                 <infra:Sparkline Values="{Binding CpuSeries}" Height="44" Capacity="60" Stroke="{StaticResource AccentBrush}"
-                                                 ToolTip="CPU usage, last 60 refreshes" />
+                                                 ToolTip="Uso de CPU nas últimas 60 atualizações" />
                                 <TextBlock Text="{Binding CpuModel}" Margin="0,10,0,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding CpuModel}" />
                                 <TextBlock Text="{Binding CpuDetail}" Style="{StaticResource MutedText}" />
                             </StackPanel>
@@ -162,7 +162,7 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <Grid>
-                                    <TextBlock Text="MEMORY (RAM)" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="MEMÓRIA (RAM)" Style="{StaticResource SectionText}" />
                                     <ContentPresenter Content="{Binding MemoryStatus}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" VerticalAlignment="Top" />
                                 </Grid>
                                 <TextBlock Text="{Binding MemoryValue}" Style="{StaticResource BigValueText}" />
@@ -177,7 +177,7 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <Grid>
-                                    <TextBlock Text="TEMPERATURE" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="TEMPERATURA" Style="{StaticResource SectionText}" />
                                     <ContentPresenter Content="{Binding TemperatureStatus}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" VerticalAlignment="Top" />
                                 </Grid>
                                 <TextBlock Text="{Binding TemperatureValue}" Style="{StaticResource BigValueText}" />
@@ -187,7 +187,7 @@
                     </infra:AdaptiveGrid>
 
                     <!-- Storage -->
-                    <TextBlock Text="STORAGE · LOCAL FIXED DRIVES" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
+                    <TextBlock Text="ARMAZENAMENTO · UNIDADES FIXAS LOCAIS" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
                     <ItemsControl ItemsSource="{Binding Drives}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -216,17 +216,17 @@
                     </ItemsControl>
 
                     <!-- Alerts -->
-                    <TextBlock Text="ALERTS" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
+                    <TextBlock Text="ALERTAS" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="No alerts. All monitored components are within the configured thresholds." Foreground="{StaticResource AccentBrush}"
+                            <TextBlock Text="Nenhum alerta. Todos os componentes monitorados estão dentro dos limites configurados." Foreground="{StaticResource AccentBrush}"
                                        Visibility="{Binding Alerts.Count, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}" />
                             <ItemsControl ItemsSource="{Binding Alerts}" ItemTemplate="{StaticResource MessageTemplate}" />
                         </StackPanel>
                     </Border>
 
                     <!-- Notes -->
-                    <TextBlock Text="NOTES" Style="{StaticResource SectionText}" Margin="6,14,6,2"
+                    <TextBlock Text="OBSERVAÇÕES" Style="{StaticResource SectionText}" Margin="6,14,6,2"
                                Visibility="{Binding Notes.Count, Converter={StaticResource NotEmptyToVisibility}}" />
                     <Border Style="{StaticResource Card}" Visibility="{Binding Notes.Count, Converter={StaticResource NotEmptyToVisibility}}">
                         <ItemsControl ItemsSource="{Binding Notes}" ItemTemplate="{StaticResource MessageTemplate}" />
@@ -236,7 +236,7 @@
         </TabItem>
 
         <!-- ===================== PROCESSES ===================== -->
-        <TabItem Header="Processes">
+        <TabItem Header="Processos">
             <Grid Margin="22" DataContext="{Binding Processes}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -245,8 +245,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid>
-                    <TextBlock Text="Top processes" Style="{StaticResource PageHeader}" />
-                    <Button Content="Refresh" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}" Margin="6,0" />
+                    <TextBlock Text="Principais processos" Style="{StaticResource PageHeader}" />
+                    <Button Content="Atualizar" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}" Margin="6,0" />
                 </Grid>
                 <TextBlock Grid.Row="1" Text="{Binding Summary}" Style="{StaticResource PageSub}" />
                 <StackPanel Grid.Row="2">
@@ -262,23 +262,23 @@
                     </Grid.ColumnDefinitions>
                     <Border Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Top" Text="BY MEMORY (WORKING SET)" Style="{StaticResource SectionText}" />
+                            <TextBlock DockPanel.Dock="Top" Text="POR MEMÓRIA (WORKING SET)" Style="{StaticResource SectionText}" />
                             <DataGrid ItemsSource="{Binding TopMemory}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="70" />
-                                    <DataGridTextColumn Header="PROCESS" Binding="{Binding Name}" Width="*" />
-                                    <DataGridTextColumn Header="MEMORY" Binding="{Binding Memory}" Width="100" />
+                                    <DataGridTextColumn Header="PROCESSO" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="MEMÓRIA" Binding="{Binding Memory}" Width="100" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
                     </Border>
                     <Border Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Top" Text="BY CPU (% OF TOTAL CPU CAPACITY)" Style="{StaticResource SectionText}" />
+                            <TextBlock DockPanel.Dock="Top" Text="POR CPU (% DA CAPACIDADE TOTAL DE CPU)" Style="{StaticResource SectionText}" />
                             <DataGrid ItemsSource="{Binding TopCpu}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="70" />
-                                    <DataGridTextColumn Header="PROCESS" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="PROCESSO" Binding="{Binding Name}" Width="*" />
                                     <DataGridTextColumn Header="CPU" Binding="{Binding Cpu}" Width="80" />
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -289,18 +289,18 @@
         </TabItem>
 
         <!-- ===================== FULL SCAN ===================== -->
-        <TabItem Header="Full scan">
+        <TabItem Header="Verificação completa">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DataContext="{Binding Scan}">
                 <StackPanel Margin="22">
-                    <TextBlock Text="Full scan" Style="{StaticResource PageHeader}" />
+                    <TextBlock Text="Verificação completa" Style="{StaticResource PageHeader}" />
                     <TextBlock Text="{Binding Description}" Style="{StaticResource PageSub}" />
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <WrapPanel>
-                                <Button Content="Run full scan" AutomationProperties.AutomationId="RunScanButton" Command="{Binding RunCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,10,6" />
-                                <Button Content="Cancel" AutomationProperties.AutomationId="CancelScanButton" Command="{Binding CancelCommand}" Margin="0,0,18,6" />
-                                <CheckBox Content="Also generate a report (JSON + TXT)" IsChecked="{Binding GenerateReport}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <Button Content="Executar verificação completa" AutomationProperties.AutomationId="RunScanButton" Command="{Binding RunCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,10,6" />
+                                <Button Content="Cancelar" AutomationProperties.AutomationId="CancelScanButton" Command="{Binding CancelCommand}" Margin="0,0,18,6" />
+                                <CheckBox Content="Gerar também um relatório (JSON + TXT)" IsChecked="{Binding GenerateReport}" VerticalAlignment="Center" Margin="0,0,0,6"
                                           IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBool}}" />
                             </WrapPanel>
                             <ProgressBar IsIndeterminate="{Binding IsRunning, Mode=OneWay}" Margin="0,10,0,0" Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}" />
@@ -316,31 +316,31 @@
                     <StackPanel Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}" Margin="0,12,0,0">
                         <Border Style="{StaticResource Card}" BorderBrush="{Binding Overall, Converter={StaticResource StatusBrush}}">
                             <StackPanel>
-                                <TextBlock Text="RESULT" Style="{StaticResource SectionText}" />
-                                <TextBlock Text="{Binding Overall}" FontSize="26" FontWeight="SemiBold" Foreground="{Binding Overall, Converter={StaticResource StatusBrush}}" />
+                                <TextBlock Text="RESULTADO" Style="{StaticResource SectionText}" />
+                                <TextBlock Text="{Binding Overall, Converter={StaticResource StatusText}}" FontSize="26" FontWeight="SemiBold" Foreground="{Binding Overall, Converter={StaticResource StatusBrush}}" />
                                 <TextBlock Text="{Binding ResultHeader}" Style="{StaticResource MutedText}" />
                                 <TextBlock Text="{Binding SavedText}" Margin="0,8,0,0" Visibility="{Binding SavedText, Converter={StaticResource NotEmptyToVisibility}}" />
                                 <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Visibility="{Binding ReportPath, Converter={StaticResource NotEmptyToVisibility}}">
                                     <TextBlock Text="{Binding ReportPath}" Style="{StaticResource MutedText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="620" />
-                                    <Button Content="Open report folder" Command="{Binding OpenReportsCommand}" Margin="12,0,0,0" />
+                                    <Button Content="Abrir pasta do relatório" Command="{Binding OpenReportsCommand}" Margin="12,0,0,0" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource Card}">
                             <DockPanel>
-                                <TextBlock DockPanel.Dock="Top" Text="COMPONENTS" Style="{StaticResource SectionText}" />
+                                <TextBlock DockPanel.Dock="Top" Text="COMPONENTES" Style="{StaticResource SectionText}" />
                                 <DataGrid ItemsSource="{Binding Components}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="COMPONENT" Binding="{Binding Name}" Width="150" />
-                                        <DataGridTemplateColumn Header="STATUS" Width="110">
+                                        <DataGridTextColumn Header="COMPONENTE" Binding="{Binding Name}" Width="150" />
+                                        <DataGridTemplateColumn Header="ESTADO" Width="110">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <ContentPresenter Content="{Binding Status}" ContentTemplate="{StaticResource PillTemplate}" />
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="EVIDENCE" Binding="{Binding Value}" Width="*" />
+                                        <DataGridTextColumn Header="EVIDÊNCIA" Binding="{Binding Value}" Width="*" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
@@ -348,7 +348,7 @@
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="DIAGNOSTIC MESSAGES" Style="{StaticResource SectionText}" />
+                                <TextBlock Text="MENSAGENS DE DIAGNÓSTICO" Style="{StaticResource SectionText}" />
                                 <ItemsControl ItemsSource="{Binding Messages}" ItemTemplate="{StaticResource MessageTemplate}" />
                             </StackPanel>
                         </Border>
@@ -358,10 +358,10 @@
                                 <TextBlock DockPanel.Dock="Top" Text="{Binding ComparisonHeader}" Style="{StaticResource SectionText}" TextWrapping="Wrap" />
                                 <DataGrid ItemsSource="{Binding Changes}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="METRIC" Binding="{Binding Metric}" Width="*" />
-                                        <DataGridTextColumn Header="PREVIOUS" Binding="{Binding Previous}" Width="110" />
-                                        <DataGridTextColumn Header="CURRENT" Binding="{Binding Current}" Width="110" />
-                                        <DataGridTextColumn Header="CHANGE" Binding="{Binding Change}" Width="2*" />
+                                        <DataGridTextColumn Header="MÉTRICA" Binding="{Binding Metric}" Width="*" />
+                                        <DataGridTextColumn Header="ANTERIOR" Binding="{Binding Previous}" Width="110" />
+                                        <DataGridTextColumn Header="ATUAL" Binding="{Binding Current}" Width="110" />
+                                        <DataGridTextColumn Header="MUDANÇA" Binding="{Binding Change}" Width="2*" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
@@ -372,7 +372,7 @@
         </TabItem>
 
         <!-- ===================== HISTORY ===================== -->
-        <TabItem Header="History">
+        <TabItem Header="Histórico">
             <Grid Margin="22" DataContext="{Binding History}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -381,8 +381,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid>
-                    <TextBlock Text="History" Style="{StaticResource PageHeader}" />
-                    <Button Content="Refresh" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Margin="6,0" />
+                    <TextBlock Text="Histórico" Style="{StaticResource PageHeader}" />
+                    <Button Content="Atualizar" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Margin="6,0" />
                 </Grid>
                 <TextBlock Grid.Row="1" Text="{Binding Summary}" Style="{StaticResource PageSub}" />
                 <StackPanel Grid.Row="2">
@@ -393,19 +393,19 @@
                 </StackPanel>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" MinWidth="380" />
-                        <ColumnDefinition Width="2*" MinWidth="280" />
+                        <ColumnDefinition Width="2*" MinWidth="380" />
+                        <ColumnDefinition Width="*" MinWidth="280" />
                     </Grid.ColumnDefinitions>
                     <Border Style="{StaticResource Card}">
                         <DataGrid ItemsSource="{Binding Scans}" SelectedItem="{Binding Selected}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="0.5*" MinWidth="36" />
-                                <DataGridTextColumn Header="DATE" Binding="{Binding Date}" Width="1.8*" MinWidth="122" />
-                                <DataGridTextColumn Header="CPU AVG" Binding="{Binding CpuAverage}" Width="*" MinWidth="64" />
-                                <DataGridTextColumn Header="PEAK" Binding="{Binding CpuPeak}" Width="*" MinWidth="58" />
-                                <DataGridTextColumn Header="MEMORY" Binding="{Binding Memory}" Width="*" MinWidth="66" />
-                                <DataGridTextColumn Header="DISK MAX" Binding="{Binding DiskMax}" Width="1.3*" MinWidth="80" />
-                                <DataGridTemplateColumn Header="HEALTH" Width="1.4*" MinWidth="98">
+                                <DataGridTextColumn Header="DATA" Binding="{Binding Date}" Width="1.8*" MinWidth="122" />
+                                <DataGridTextColumn Header="CPU MÉD." Binding="{Binding CpuAverage}" Width="*" MinWidth="64" />
+                                <DataGridTextColumn Header="PICO" Binding="{Binding CpuPeak}" Width="*" MinWidth="58" />
+                                <DataGridTextColumn Header="MEMÓRIA" Binding="{Binding Memory}" Width="*" MinWidth="66" />
+                                <DataGridTextColumn Header="DISCO MÁX." Binding="{Binding DiskMax}" Width="1.3*" MinWidth="80" />
+                                <DataGridTemplateColumn Header="SAÚDE" Width="1.4*" MinWidth="98">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ContentPresenter Content="{Binding Health}" ContentTemplate="{StaticResource PillTemplate}" />
@@ -418,7 +418,7 @@
                     <Border Grid.Column="1" Style="{StaticResource Card}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
-                                <TextBlock Text="Select a scan to see its details." Style="{StaticResource MutedText}"
+                                <TextBlock Text="Selecione uma verificação para ver os detalhes." Style="{StaticResource MutedText}"
                                            Visibility="{Binding DetailHeader, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}" />
                                 <TextBlock Text="{Binding DetailHeader}" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,0,0,10" />
                                 <ItemsControl ItemsSource="{Binding Details}">
@@ -437,7 +437,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <TextBlock Text="MESSAGES" Style="{StaticResource SectionText}" Margin="0,14,0,4"
+                                <TextBlock Text="MENSAGENS" Style="{StaticResource SectionText}" Margin="0,14,0,4"
                                            Visibility="{Binding Messages.Count, Converter={StaticResource NotEmptyToVisibility}}" />
                                 <ItemsControl ItemsSource="{Binding Messages}" ItemTemplate="{StaticResource MessageTemplate}" />
                                 <TextBlock Text="{Binding ComparisonHeader}" Style="{StaticResource SectionText}" TextWrapping="Wrap" Margin="0,14,0,4"
@@ -468,36 +468,36 @@
         </TabItem>
 
         <!-- ===================== ABOUT ===================== -->
-        <TabItem Header="About">
+        <TabItem Header="Sobre">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="22" MaxWidth="900" HorizontalAlignment="Left">
-                    <TextBlock Text="About PC Health Monitor" Style="{StaticResource PageHeader}" />
+                    <TextBlock Text="Sobre o PC Health Monitor" Style="{StaticResource PageHeader}" />
                     <TextBlock Style="{StaticResource PageSub}">
-                        <Run Text="Version " /><Run Text="{Binding Version, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding RuntimeText, Mode=OneWay}" />
+                        <Run Text="Versão " /><Run Text="{Binding Version, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding RuntimeText, Mode=OneWay}" />
                     </TextBlock>
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="WHAT THIS APP DOES" Style="{StaticResource SectionText}" />
-                            <TextBlock TextWrapping="Wrap" Text="Reads CPU, memory, local drive and (when Windows exposes it) temperature information, classifies each component as OK, WARNING, CRITICAL or UNKNOWN using the thresholds below, and keeps a local history of full scans so you can see how this computer changes over time." />
+                            <TextBlock Text="O QUE ESTE APLICATIVO FAZ" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="Lê informações de CPU, memória, unidades locais e (quando o Windows disponibiliza) temperatura, classifica cada componente como OK, ALERTA, CRÍTICO ou DESCONHECIDO usando os limites abaixo e mantém um histórico local das verificações completas para você acompanhar como este computador muda ao longo do tempo." />
                             <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource MutedBrush}"
-                                       Text="It is a read-only diagnostic tool: it never changes settings, never ends or modifies processes, never deletes files and never asks for administrator rights. Maintenance decisions are left to you." />
+                                       Text="É uma ferramenta de diagnóstico somente leitura: nunca altera configurações, nunca encerra ou modifica processos, nunca apaga arquivos e nunca pede privilégios de administrador. As decisões de manutenção ficam com você." />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="THRESHOLDS (WARNING / CRITICAL)" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="LIMITES (ALERTA / CRÍTICO)" Style="{StaticResource SectionText}" />
                             <TextBlock Text="{Binding ThresholdsText}" TextWrapping="Wrap" />
                             <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Style="{StaticResource MutedText}"
-                                       Text="UNKNOWN means a metric could not be read; it never makes the overall result worse by itself. Optional settings: place an appsettings.json file next to PCHealthMonitor.exe (see the README)." />
+                                       Text="DESCONHECIDO significa que uma métrica não pôde ser lida; isso nunca piora o resultado geral por si só. Configurações opcionais: coloque um arquivo appsettings.json ao lado do PCHealthMonitor.exe (veja o README)." />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="PRIVACY AND LOCAL DATA" Style="{StaticResource SectionText}" />
-                            <TextBlock TextWrapping="Wrap" Text="Nothing is sent over the network. Scans, reports and logs are stored only on this computer, for your Windows user:" />
+                            <TextBlock Text="PRIVACIDADE E DADOS LOCAIS" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="Nada é enviado pela rede. Verificações, relatórios e logs ficam armazenados apenas neste computador, para o seu usuário do Windows:" />
                             <Grid Margin="0,10,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="90" />
@@ -508,29 +508,29 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="History" Foreground="{StaticResource MutedBrush}" />
+                                <TextBlock Text="Histórico" Foreground="{StaticResource MutedBrush}" />
                                 <TextBox Grid.Column="1" Text="{Binding DatabaseFile, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
-                                <TextBlock Grid.Row="1" Text="Reports" Foreground="{StaticResource MutedBrush}" />
+                                <TextBlock Grid.Row="1" Text="Relatórios" Foreground="{StaticResource MutedBrush}" />
                                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ReportsFolder, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
                                 <TextBlock Grid.Row="2" Text="Logs" Foreground="{StaticResource MutedBrush}" />
                                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LogsFolder, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
                             </Grid>
                             <WrapPanel Margin="0,12,0,0">
-                                <Button Content="Open data folder" Command="{Binding OpenDataFolderCommand}" Margin="0,0,10,0" />
-                                <Button Content="Open logs folder" Command="{Binding OpenLogsFolderCommand}" />
+                                <Button Content="Abrir pasta de dados" Command="{Binding OpenDataFolderCommand}" Margin="0,0,10,0" />
+                                <Button Content="Abrir pasta de logs" Command="{Binding OpenLogsFolderCommand}" />
                             </WrapPanel>
                             <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Style="{StaticResource MutedText}"
-                                       Text="To remove all data, close the app and delete the data folder. The app installs nothing and does not start with Windows." />
+                                       Text="Para remover todos os dados, feche o aplicativo e apague a pasta de dados. O aplicativo não instala nada e não inicia com o Windows." />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="KNOWN LIMITATIONS" Style="{StaticResource SectionText}" />
-                            <TextBlock TextWrapping="Wrap" Text="• Temperature comes only from firmware (ACPI) thermal zones exposed by Windows. A thermal zone is not necessarily the CPU core sensor, and many computers expose none — then it is shown as Unavailable. Values are never estimated." />
-                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• CPU usage is time-based; Task Manager shows “processor utility”, which also considers clock frequency, so values can differ slightly." />
-                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• Process memory is the working set (includes shared pages); Task Manager shows the private working set by default." />
-                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• Disk physical health (SMART), GPU, battery and network are not evaluated in this version." />
+                            <TextBlock Text="LIMITAÇÕES CONHECIDAS" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="• A temperatura vem apenas das zonas térmicas do firmware (ACPI) expostas pelo Windows. Uma zona térmica não é necessariamente o sensor do núcleo da CPU, e muitos computadores não expõem nenhuma — nesse caso aparece como Indisponível. Os valores nunca são estimados." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• O uso de CPU é baseado em tempo; o Gerenciador de Tarefas mostra a “utilidade do processador”, que também considera a frequência, então os valores podem diferir um pouco." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• A memória por processo é o working set (inclui páginas compartilhadas); o Gerenciador de Tarefas mostra, por padrão, o working set privado." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• A saúde física dos discos (SMART), GPU, bateria e rede não são avaliadas nesta versão." />
                         </StackPanel>
                     </Border>
                 </StackPanel>

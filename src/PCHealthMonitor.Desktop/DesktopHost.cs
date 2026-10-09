@@ -61,7 +61,7 @@ public sealed class DesktopHost : IDisposable
         catch (InvalidConfigurationException ex)
         {
             options = new PcHealthOptions();
-            warning = "The configuration file is invalid, so default settings are being used: " + string.Join(" ", ex.Errors);
+            warning = "O arquivo de configuração é inválido; as configurações padrão estão sendo usadas. " + string.Join(" ", ex.Errors.Select(Infrastructure.PtBr.Message));
         }
 
         var root = dataRoot ?? DefaultDataRoot;

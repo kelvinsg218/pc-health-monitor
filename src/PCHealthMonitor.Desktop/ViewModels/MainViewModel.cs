@@ -54,10 +54,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         get
         {
             var t = _host.Options.Thresholds;
-            return $"CPU {Display.Number(t.CpuWarning)}% / {Display.Number(t.CpuCritical)}%   ·   " +
-                   $"Memory {Display.Number(t.MemoryWarning)}% / {Display.Number(t.MemoryCritical)}%   ·   " +
-                   $"Storage {Display.Number(t.StorageWarning)}% / {Display.Number(t.StorageCritical)}%   ·   " +
-                   $"Temperature {Display.Number(t.TemperatureWarning)} / {Display.Number(t.TemperatureCritical)} °C";
+            return $"CPU {PtBr.Number(t.CpuWarning)}% / {PtBr.Number(t.CpuCritical)}%   ·   " +
+                   $"Memória {PtBr.Number(t.MemoryWarning)}% / {PtBr.Number(t.MemoryCritical)}%   ·   " +
+                   $"Armazenamento {PtBr.Number(t.StorageWarning)}% / {PtBr.Number(t.StorageCritical)}%   ·   " +
+                   $"Temperatura {PtBr.Number(t.TemperatureWarning)} / {PtBr.Number(t.TemperatureCritical)} °C";
         }
     }
 

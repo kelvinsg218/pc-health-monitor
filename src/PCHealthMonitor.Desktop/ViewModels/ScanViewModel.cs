@@ -44,9 +44,9 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
     public RelayCommand OpenReportsCommand { get; }
 
     public string Description =>
-        $"Samples CPU every {Display.Number(_host.Options.Scan.SampleIntervalSeconds)} s for {Display.Number(_host.Options.Scan.DurationSeconds)} s, " +
-        "measures processes over the same window, analyzes memory, drives and temperature, saves the result to the local history " +
-        "and compares it with the previous scan of this computer.";
+        $"Amostra a CPU a cada {PtBr.Number(_host.Options.Scan.SampleIntervalSeconds)} s durante {PtBr.Number(_host.Options.Scan.DurationSeconds)} s, " +
+        "mede os processos na mesma janela, analisa memória, unidades e temperatura, salva o resultado no histórico local " +
+        "e compara com a verificação anterior deste computador.";
 
     public bool GenerateReport { get => _generateReport; set => Set(ref _generateReport, value); }
 
@@ -86,8 +86,8 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
         _cts = new CancellationTokenSource();
         IsRunning = true;
         ErrorMessage = null;
-        ProgressText = "Starting full scan…";
-        var progress = new Progress<string>(text => ProgressText = text);
+        ProgressText = "Iniciando a verificação completa…";
+        var progress = new Progress<string>(text => ProgressText = PtBr.Message(text));
         try
         {
             var token = _cts.Token;
@@ -100,7 +100,7 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            ProgressText = "Scan cancelled. Nothing was saved.";
+            ProgressText = "Verificação cancelada. Nada foi salvo.";
         }
         finally
         {
@@ -118,40 +118,44 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
 
         HasResult = true;
         Overall = assessment.Overall.ToLabel();
-        ResultHeader = $"Scan of {result.Hostname} · {Display.LocalDateTime(result.StartedAt)}"
-            + (assessment.IsIncomplete ? " · incomplete data" : string.Empty);
-        ProgressText = "Scan finished.";
+        ResultHeader = $"Verificação de {result.Hostname} · {PtBr.DateTime(result.StartedAt)}"
+            + (assessment.IsIncomplete ? " · dados incompletos" : string.Empty);
+        ProgressText = "Verificação concluída.";
 
         Components.Clear();
         var cpu = snapshot.Cpu;
         Components.Add(Row(assessment, HealthComponent.Cpu, "CPU",
-            cpu is null ? "Unavailable" : $"avg {Display.Percent(cpu.Usage.Average)} · peak {Display.Percent(cpu.Usage.Peak)} · min {Display.Percent(cpu.Usage.Minimum)}"));
-        Components.Add(Row(assessment, HealthComponent.Memory, "Memory",
-            snapshot.Memory is { TotalBytes: > 0 } m ? $"{Display.Percent(m.UsagePercent)} · {Display.Bytes(m.UsedBytes)} of {Display.Bytes(m.TotalBytes)}" : "Unavailable"));
+            cpu is null ? PtBr.Unavailable : $"média {PtBr.Percent(cpu.Usage.Average)} · pico {PtBr.Percent(cpu.Usage.Peak)} · mín. {PtBr.Percent(cpu.Usage.Minimum)}"));
+        Components.Add(Row(assessment, HealthComponent.Memory, "Memória",
+            snapshot.Memory is { TotalBytes: > 0 } m ? $"{PtBr.Percent(m.UsagePercent)} · {PtBr.Bytes(m.UsedBytes)} de {PtBr.Bytes(m.TotalBytes)}" : PtBr.Unavailable));
         foreach (var drive in assessment.Drives)
         {
-            Components.Add(new ComponentRowViewModel($"Drive {drive.Name}", drive.Status.ToLabel(), drive.Evidence));
+            var metrics = snapshot.Storage?.Drives.FirstOrDefault(d => d.Name == drive.Name);
+            var value = metrics is null
+                ? PtBr.Unavailable
+                : $"{PtBr.Percent(metrics.UsagePercent)} em uso, {PtBr.Bytes(metrics.FreeBytes)} livres de {PtBr.Bytes(metrics.TotalBytes)}";
+            Components.Add(new ComponentRowViewModel($"Unidade {drive.Name}", drive.Status.ToLabel(), value));
         }
 
         if (assessment.Drives.Count == 0)
         {
-            Components.Add(Row(assessment, HealthComponent.Storage, "Storage", "Unavailable"));
+            Components.Add(Row(assessment, HealthComponent.Storage, "Armazenamento", PtBr.Unavailable));
         }
 
-        Components.Add(Row(assessment, HealthComponent.Temperature, "Temperature",
-            snapshot.Temperature?.MaxCelsius is { } t ? $"{Display.Celsius(t)} (ACPI thermal zone)" : "Unavailable"));
+        Components.Add(Row(assessment, HealthComponent.Temperature, "Temperatura",
+            snapshot.Temperature?.MaxCelsius is { } t ? $"{PtBr.Celsius(t)} (zona térmica ACPI)" : PtBr.Unavailable));
 
         Messages.Clear();
         foreach (var message in assessment.Messages.OrderByDescending(x => x.Severity))
         {
-            Messages.Add(new MessageViewModel(message.Severity.ToLabel(), message.Component.ToLabel(), message.Text));
+            Messages.Add(new MessageViewModel(message.Severity.ToLabel(), PtBr.Component(message.Component.ToLabel()), PtBr.Message(message.Text)));
         }
 
         Changes.Clear();
         ComparisonHeader = null;
         if (outcome.Comparison is { } comparison)
         {
-            ComparisonHeader = $"Observed change since scan #{comparison.Previous.Id} ({Display.LocalDateTimeShort(comparison.Previous.StartedAt)}) — not a prediction";
+            ComparisonHeader = $"Mudança observada desde a verificação nº {comparison.Previous.Id} ({PtBr.DateTimeShort(comparison.Previous.StartedAt)}) — não é uma previsão";
             foreach (var row in ChangeRowViewModel.From(comparison))
             {
                 Changes.Add(row);
@@ -159,12 +163,12 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
         }
 
         SavedText = outcome.SavedScan is { } saved
-            ? $"Saved to history as scan #{saved.Id}."
-            : outcome.HistoryError;
+            ? $"Salva no histórico como verificação nº {saved.Id}."
+            : PtBr.Message(outcome.HistoryError);
         ReportPath = outcome.Report?.JsonPath;
         if (outcome.ReportError is { } reportError)
         {
-            ErrorMessage = reportError;
+            ErrorMessage = PtBr.Message(reportError);
         }
     }
 
@@ -174,7 +178,7 @@ public sealed class ScanViewModel : ObservableObject, IDisposable
     private void OnError(Exception ex)
     {
         _host.Logger.LogError(ex, "Full scan failed.");
-        ErrorMessage = "The scan could not be completed. Details were written to the log file.";
+        ErrorMessage = "Não foi possível concluir a verificação. Os detalhes foram gravados no arquivo de log.";
         ProgressText = string.Empty;
     }
 }
@@ -188,16 +192,26 @@ public sealed record ChangeRowViewModel(string Metric, string Previous, string C
         foreach (var change in comparison.Changes)
         {
             yield return new ChangeRowViewModel(
-                change.Metric,
-                Display.Percent(change.Previous),
-                Display.Percent(change.Current),
-                change.DeltaPoints is { } d ? Display.PercentagePoints(d) : "n/a");
+                MetricName(change.Metric),
+                PtBr.Percent(change.Previous),
+                PtBr.Percent(change.Current),
+                change.DeltaPoints is { } d ? PtBr.PercentagePoints(d) : "n/d");
         }
 
         yield return new ChangeRowViewModel(
-            "Overall health",
-            comparison.Previous.OverallHealth.ToLabel(),
-            comparison.Current.OverallHealth.ToLabel(),
-            comparison.OverallChanged ? "changed" : "unchanged");
+            "Saúde geral",
+            PtBr.Status(comparison.Previous.OverallHealth.ToLabel()),
+            PtBr.Status(comparison.Current.OverallHealth.ToLabel()),
+            comparison.OverallChanged ? "mudou" : "sem mudança");
     }
+
+    private static string MetricName(string metric) => metric switch
+    {
+        "CPU average" => "CPU (média)",
+        "CPU peak" => "CPU (pico)",
+        "Memory usage" => "Uso de memória",
+        _ when metric.StartsWith("Drive ", StringComparison.Ordinal) && metric.EndsWith(" usage", StringComparison.Ordinal)
+            => $"Uso da unidade {metric[6..^6]}",
+        _ => metric,
+    };
 }

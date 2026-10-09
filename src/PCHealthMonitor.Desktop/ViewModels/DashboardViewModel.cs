@@ -40,7 +40,7 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
     private string _uptime = "…";
     private string _lastUpdated = "…";
     private string _overall = "UNKNOWN";
-    private string _overallReason = "Collecting metrics…";
+    private string _overallReason = "Coletando métricas…";
     private bool _isIncomplete;
     private string _cpuValue = "—";
     private double _cpuPercent;
@@ -55,7 +55,7 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
     private string _memorySub = "—";
     private string _temperatureValue = "—";
     private string _temperatureStatus = "UNKNOWN";
-    private string _temperatureDetail = "Reading thermal zones…";
+    private string _temperatureDetail = "Lendo zonas térmicas…";
 
     public DashboardViewModel(DesktopHost host, Dispatcher dispatcher)
     {
@@ -67,7 +67,7 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
 
     public double RefreshSeconds { get; }
 
-    public string RefreshText => $"Live · refresh every {Display.Number(RefreshSeconds)} s · not saved to history";
+    public string RefreshText => $"Ao vivo · atualiza a cada {PtBr.Number(RefreshSeconds)} s · não é salvo no histórico";
 
     public ObservableCollection<DriveCardViewModel> Drives { get; } = [];
 
@@ -189,7 +189,7 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
             await _dispatcher.InvokeAsync(() =>
             {
                 IsLoading = false;
-                ErrorMessage = "Live monitoring stopped because of an unexpected error. Details were written to the log file.";
+                ErrorMessage = "O monitoramento ao vivo parou por causa de um erro inesperado. Os detalhes foram gravados no arquivo de log.";
             });
         }
     }
@@ -233,15 +233,15 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
             Windows = system.WindowsDescription + build;
         }
 
-        Uptime = Display.Uptime(tick.Uptime);
+        Uptime = PtBr.Uptime(tick.Uptime);
 
         // CPU
-        CpuModel = _cpuInfo.Name ?? "CPU model unavailable";
-        CpuDetail = $"{_cpuInfo.LogicalProcessorCount} logical processors";
+        CpuModel = _cpuInfo.Name ?? "Modelo da CPU indisponível";
+        CpuDetail = $"{_cpuInfo.LogicalProcessorCount} processadores lógicos";
         CpuStatus = assessment.StatusOf(HealthComponent.Cpu).ToLabel();
         if (tick.CpuPercent is { } cpu)
         {
-            CpuValue = Display.Percent(cpu);
+            CpuValue = PtBr.Percent(cpu);
             CpuPercent = cpu;
             _cpuHistory.Add(cpu);
             if (_cpuHistory.Count > HistoryCapacity)
@@ -253,7 +253,7 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
         }
         else
         {
-            CpuValue = "Unavailable";
+            CpuValue = PtBr.Unavailable;
             CpuPercent = 0;
         }
 
@@ -261,18 +261,18 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
         MemoryStatus = assessment.StatusOf(HealthComponent.Memory).ToLabel();
         if (tick.Memory is { TotalBytes: > 0 } memory)
         {
-            MemoryValue = Display.Percent(memory.UsagePercent);
+            MemoryValue = PtBr.Percent(memory.UsagePercent);
             MemoryPercent = memory.UsagePercent;
-            MemoryDetail = $"{Display.Bytes(memory.UsedBytes)} of {Display.Bytes(memory.TotalBytes)} in use";
+            MemoryDetail = $"{PtBr.Bytes(memory.UsedBytes)} de {PtBr.Bytes(memory.TotalBytes)} em uso";
             MemorySub = memory.InstalledBytes is { } installed && installed != memory.TotalBytes
-                ? $"{Display.Bytes(memory.AvailableBytes)} available · {Display.Bytes(installed)} installed"
-                : $"{Display.Bytes(memory.AvailableBytes)} available";
+                ? $"{PtBr.Bytes(memory.AvailableBytes)} disponíveis · {PtBr.Bytes(installed)} instalados"
+                : $"{PtBr.Bytes(memory.AvailableBytes)} disponíveis";
         }
         else
         {
-            MemoryValue = "Unavailable";
+            MemoryValue = PtBr.Unavailable;
             MemoryPercent = 0;
-            MemoryDetail = "Memory information could not be read.";
+            MemoryDetail = "Não foi possível ler as informações de memória.";
             MemorySub = string.Empty;
         }
 
@@ -284,12 +284,12 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
         IsIncomplete = assessment.IsIncomplete;
         var reasons = assessment.Reasons.ToList();
         OverallReason = reasons.Count > 0
-            ? reasons[0].Text
-            : "All monitored components are within the configured thresholds.";
+            ? PtBr.Message(reasons[0].Text)
+            : "Todos os componentes monitorados estão dentro dos limites configurados.";
 
-        Sync(Alerts, reasons.Select(m => new MessageViewModel(m.Severity.ToLabel(), m.Component.ToLabel(), m.Text)).ToList());
+        Sync(Alerts, reasons.Select(m => new MessageViewModel(m.Severity.ToLabel(), PtBr.Component(m.Component.ToLabel()), PtBr.Message(m.Text))).ToList());
         Sync(Notes, assessment.Messages.Where(m => m.Severity == MessageSeverity.Info)
-            .Select(m => new MessageViewModel("INFO", m.Component.ToLabel(), m.Text)).ToList());
+            .Select(m => new MessageViewModel("INFO", PtBr.Component(m.Component.ToLabel()), PtBr.Message(m.Text))).ToList());
     }
 
     private void UpdateDrives(StorageSnapshot? storage, HealthAssessment assessment)
@@ -301,23 +301,23 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
             {
                 cards.Add(new DriveCardViewModel(
                     drive.Name,
-                    drive.Label is null ? $"{drive.FileSystem ?? "?"} · local fixed drive" : $"{drive.Label} · {drive.FileSystem ?? "?"}",
-                    Display.Percent(drive.UsagePercent),
+                    drive.Label is null ? $"{drive.FileSystem ?? "?"} · unidade fixa local" : $"{drive.Label} · {drive.FileSystem ?? "?"}",
+                    PtBr.Percent(drive.UsagePercent),
                     drive.UsagePercent,
                     (assessment.DriveStatus(drive.Name) ?? HealthStatus.Unknown).ToLabel(),
-                    $"{Display.Bytes(drive.FreeBytes)} free of {Display.Bytes(drive.TotalBytes)}"));
+                    $"{PtBr.Bytes(drive.FreeBytes)} livres de {PtBr.Bytes(drive.TotalBytes)}"));
             }
 
             foreach (var name in storage.UnreadableDrives)
             {
-                cards.Add(new DriveCardViewModel(name, "local fixed drive", "Unavailable", 0, "UNKNOWN",
-                    "Drive not ready or inaccessible (e.g. locked)."));
+                cards.Add(new DriveCardViewModel(name, "unidade fixa local", PtBr.Unavailable, 0, "UNKNOWN",
+                    "Unidade não pronta ou inacessível (por exemplo, bloqueada)."));
             }
         }
 
         if (cards.Count == 0)
         {
-            cards.Add(new DriveCardViewModel("Storage", "local fixed drives", "Unavailable", 0, "UNKNOWN", "No local fixed drive could be read."));
+            cards.Add(new DriveCardViewModel("Armazenamento", "unidades fixas locais", PtBr.Unavailable, 0, "UNKNOWN", "Nenhuma unidade fixa local pôde ser lida."));
         }
 
         Sync(Drives, cards);
@@ -329,15 +329,15 @@ public sealed class DashboardViewModel : ObservableObject, IDisposable
         if (reading is { IsAvailable: true } && reading.MaxCelsius is { } max)
         {
             var hottest = reading.Zones.MaxBy(z => z.Celsius)!;
-            TemperatureValue = Display.Celsius(max);
-            TemperatureDetail = $"ACPI thermal zone {hottest.Name} (firmware). Not necessarily the CPU core sensor."
-                + (reading.ThrottlingReported ? " Windows reports thermal throttling." : string.Empty);
+            TemperatureValue = PtBr.Celsius(max);
+            TemperatureDetail = $"Zona térmica ACPI {hottest.Name} (firmware). Não é necessariamente o sensor do núcleo da CPU."
+                + (reading.ThrottlingReported ? " O Windows informa limitação térmica." : string.Empty);
         }
         else
         {
-            TemperatureValue = "Unavailable";
-            TemperatureDetail = (reading?.UnavailableReason ?? "Temperature could not be obtained.")
-                + " No value is estimated or invented.";
+            TemperatureValue = PtBr.Unavailable;
+            TemperatureDetail = PtBr.Message(reading?.UnavailableReason ?? "Temperature could not be obtained.")
+                + " Nenhum valor é estimado ou inventado.";
         }
     }
 

@@ -13,7 +13,7 @@ Aplicativo para Windows 10/11 que mostra, em uma janela simples, **como está a 
 ## Baixar e usar (sem instalar nada)
 
 1. Abra a página **[Releases](https://github.com/kelvinsg218/pc-health-monitor/releases/latest)** deste repositório.
-2. Em **Assets**, baixe **`PCHealthMonitor-1.0.0-win-x64.exe`**.
+2. Em **Assets**, baixe **`PCHealthMonitor-1.1.0-win-x64.exe`**.
 3. Dê **dois cliques** no arquivo baixado.
 
 Não é preciso instalar .NET, Python, Node.js nem qualquer outra ferramenta: tudo o que o programa precisa está dentro do `.exe`. Não há instalador; para "desinstalar", basta apagar o arquivo (veja [Seus dados](#seus-dados)).
@@ -22,10 +22,10 @@ Não é preciso instalar .NET, Python, Node.js nem qualquer outra ferramenta: tu
 
 Como o executável **não possui assinatura digital** (certificado de código pago), o Windows pode mostrar *"O Windows protegeu o computador"* na primeira execução. Para abrir mesmo assim: **Mais informações → Executar assim mesmo**.
 
-Se quiser conferir que o arquivo é exatamente o publicado, compare o SHA-256 com o arquivo `SHA256SUMS-1.0.0.txt` da Release:
+Se quiser conferir que o arquivo é exatamente o publicado, compare o SHA-256 com o arquivo `SHA256SUMS-1.1.0.txt` da Release:
 
 ```powershell
-Get-FileHash .\PCHealthMonitor-1.0.0-win-x64.exe -Algorithm SHA256
+Get-FileHash .\PCHealthMonitor-1.1.0-win-x64.exe -Algorithm SHA256
 ```
 
 ### Requisitos mínimos
@@ -71,7 +71,7 @@ Limites padrão: CPU 75% / 90%, memória 80% / 92%, disco 80% / 90%, temperatura
 
 ### Linha de comando (opcional)
 
-Para técnicos que preferem terminal ou scripts, a Release também traz `pchealth-1.0.0-win-x64.exe` com os comandos `status`, `scan`, `monitor`, `processes`, `report`, `history` e `version`. Veja [CLI](#cli).
+Para técnicos que preferem terminal ou scripts, a Release também traz `pchealth-1.1.0-win-x64.exe` com os comandos `status`, `scan`, `monitor`, `processes`, `report`, `history` e `version`. Veja [CLI](#cli).
 
 ---
 
@@ -82,8 +82,8 @@ Para técnicos que preferem terminal ou scripts, a Release também traz `pchealt
   `%LOCALAPPDATA%\PCHealthMonitor\` → `data\pchealth.db` (histórico), `reports\` (relatórios) e `logs\` (registro técnico de erros).
 - Nada é gravado ao lado do `.exe`, nada é instalado e o app **não inicia com o Windows**.
 - Para remover tudo: feche o app, apague o `.exe` e a pasta `%LOCALAPPDATA%\PCHealthMonitor`.
-- Na primeira execução, o .NET extrai as bibliotecas nativas embutidas no `.exe` (WPF e SQLite, ≈10 MB) para `%TEMP%\.net\PCHealthMonitor-1.0.0-win-x64\`. É o comportamento padrão de executáveis .NET de arquivo único; essa pasta pode ser apagada com o app fechado (é recriada quando necessário).
-- Uso portátil (ex.: pendrive): `PCHealthMonitor-1.0.0-win-x64.exe --data-dir D:\PCHealthData` grava tudo na pasta indicada.
+- Na primeira execução, o .NET extrai as bibliotecas nativas embutidas no `.exe` (WPF e SQLite, ≈10 MB) para `%TEMP%\.net\PCHealthMonitor-1.1.0-win-x64\`. É o comportamento padrão de executáveis .NET de arquivo único; essa pasta pode ser apagada com o app fechado (é recriada quando necessário).
+- Uso portátil (ex.: pendrive): `PCHealthMonitor-1.1.0-win-x64.exe --data-dir D:\PCHealthData` grava tudo na pasta indicada.
 
 Coleta apenas o necessário para o diagnóstico: métricas de hardware/sistema, nome do computador e, dos processos, somente PID, nome, memória e tempo de CPU. Não lê arquivos pessoais, navegador, senhas, área de transferência, teclado, tela ou linhas de comando.
 
@@ -103,7 +103,6 @@ Coleta apenas o necessário para o diagnóstico: métricas de hardware/sistema, 
 - **Não avaliado nesta versão:** saúde física dos discos (SMART), GPU, bateria, rede e eventos do Windows.
 - **Executável não assinado:** pode acionar o SmartScreen (ver acima).
 - **Testado em uma única máquina** (Windows 11 Home 25H2, x64, sem privilégios de administrador). Não há evidência de testes em outras máquinas ou no Windows 10 até o momento.
-- A interface está em inglês.
 
 ---
 
@@ -242,4 +241,4 @@ Validações manuais realizadas no executável final (Windows 11 Home 25H2, x64,
 
 ## Roadmap
 
-Possibilidades futuras (não implementadas): assinatura digital do executável, interface em português, gráficos de histórico, alertas/notificações, monitoramento remoto e centralizado, inventário de vários computadores, integração com o **Windows Maintenance Agent**, saúde física de discos (SMART) e bateria.
+Possibilidades futuras (não implementadas): assinatura digital do executável, gráficos de histórico, alertas/notificações, monitoramento remoto e centralizado, inventário de vários computadores, integração com o **Windows Maintenance Agent**, saúde física de discos (SMART) e bateria.

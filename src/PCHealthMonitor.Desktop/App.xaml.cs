@@ -23,7 +23,7 @@ public partial class App : System.Windows.Application
 
         if (!OperatingSystem.IsWindowsVersionAtLeast(10))
         {
-            MessageBox.Show("PC Health Monitor requires Windows 10 or Windows 11.", "PC Health Monitor",
+            MessageBox.Show("O PC Health Monitor requer Windows 10 ou Windows 11.", "PC Health Monitor",
                 MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
             return;
@@ -37,7 +37,7 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             MessageBox.Show(
-                "PC Health Monitor could not start because its data folder could not be prepared:\n\n" + ex.Message,
+                "Não foi possível iniciar o PC Health Monitor porque a pasta de dados não pôde ser preparada:\n\n" + ex.Message,
                 "PC Health Monitor", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
             return;
@@ -77,8 +77,8 @@ public partial class App : System.Windows.Application
         _host?.Logger.LogError(e.Exception, "Unhandled UI exception.");
         e.Handled = true; // keep the application running
         MessageBox.Show(
-            "An unexpected error occurred. The application will keep running.\n\n" + e.Exception.Message +
-            (_host is null ? string.Empty : "\n\nTechnical details were written to:\n" + _host.Services.LogProvider.CurrentLogFile),
+            "Ocorreu um erro inesperado. O aplicativo continuará em execução.\n\n" + e.Exception.Message +
+            (_host is null ? string.Empty : "\n\nOs detalhes técnicos foram gravados em:\n" + _host.Services.LogProvider.CurrentLogFile),
             "PC Health Monitor", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 

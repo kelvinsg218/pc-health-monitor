@@ -12,6 +12,7 @@
             <infra:BoolToVisibilityConverter x:Key="BoolToVisibility" />
             <infra:NotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
             <infra:InverseBoolConverter x:Key="InverseBool" />
+            <infra:StatusTextConverter x:Key="StatusText" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

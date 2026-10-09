@@ -104,8 +104,8 @@ public class DesktopTests
 
         var rows = ChangeRowViewModel.From(HistoryComparer.Compare(previous, current)).ToList();
 
-        Assert.Contains(rows, r => r.Metric == "Memory usage" && r.Change == "+10.0 percentage points" && r.Previous == "70.0%" && r.Current == "80.0%");
-        Assert.Equal(new ChangeRowViewModel("Overall health", "HEALTHY", "ATTENTION", "changed"), rows[^1]);
+        Assert.Contains(rows, r => r.Metric == "Uso de memória" && r.Change == "+10,0 pontos percentuais" && r.Previous == "70,0%" && r.Current == "80,0%");
+        Assert.Equal(new ChangeRowViewModel("Saúde geral", "SAUDÁVEL", "ATENÇÃO", "mudou"), rows[^1]);
     }
 
     [Fact]
@@ -114,9 +114,9 @@ public class DesktopTests
         var row = ScanRowViewModel.From(TestData.Record(93, 74, TestData.BaseTime) with { Id = 7 });
 
         Assert.Equal(7, row.Id);
-        Assert.Equal("C: 74.0%", row.DiskMax);
+        Assert.Equal("C: 74,0%", row.DiskMax);
         Assert.Equal("CRITICAL", row.Health);
-        Assert.Equal("93.0%", row.Memory);
+        Assert.Equal("93,0%", row.Memory);
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class DesktopTests
     {
         var row = ProcessRowViewModel.From(new ProcessUsage(4, "System", null, null));
 
-        Assert.Equal("Unavailable", row.Memory);
-        Assert.Equal("Unavailable", row.Cpu);
+        Assert.Equal("Indisponível", row.Memory);
+        Assert.Equal("Indisponível", row.Cpu);
     }
 }

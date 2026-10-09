@@ -12,7 +12,7 @@ public sealed class ProcessesViewModel : ObservableObject
     private readonly DesktopHost _host;
     private bool _isBusy;
     private bool _loadedOnce;
-    private string _summary = "Not measured yet.";
+    private string _summary = "Ainda não medido.";
     private string? _errorMessage;
 
     public ProcessesViewModel(DesktopHost host)
@@ -50,7 +50,7 @@ public sealed class ProcessesViewModel : ObservableObject
         {
             var options = _host.Options.Processes;
             var window = TimeSpan.FromSeconds(options.CpuSampleSeconds);
-            Summary = $"Measuring CPU usage over {Display.Number(window.TotalSeconds)} s…";
+            Summary = $"Medindo o uso de CPU durante {PtBr.Number(window.TotalSeconds)} s…";
             var summary = await Task.Run(() => _host.Services.CreateProcessService().GetTopProcessesAsync(window, options.TopCount, CancellationToken.None));
             Apply(summary);
         }
@@ -75,21 +75,21 @@ public sealed class ProcessesViewModel : ObservableObject
         }
 
         var unavailable = summary.CpuUnavailableCount == 0
-            ? "CPU measured for all of them"
-            : $"CPU unavailable for {summary.CpuUnavailableCount} (started/ended during sampling or access denied)";
-        Summary = $"{summary.TotalProcesses} processes inspected · {unavailable} · CPU window {Display.Number(summary.CpuSampleWindow.TotalSeconds, "0.0")} s · updated {DateTime.Now:HH:mm:ss}";
+            ? "CPU medida para todos"
+            : $"CPU indisponível para {summary.CpuUnavailableCount} (iniciados/encerrados durante a amostragem ou acesso negado)";
+        Summary = $"{summary.TotalProcesses} processos analisados · {unavailable} · janela de CPU de {PtBr.Number(summary.CpuSampleWindow.TotalSeconds, "0.0")} s · atualizado às {DateTime.Now:HH:mm:ss}";
     }
 
     private void OnError(Exception ex)
     {
         _host.Logger.LogError(ex, "Process list could not be collected.");
-        ErrorMessage = "The process list could not be collected. Details were written to the log file.";
-        Summary = "Unavailable.";
+        ErrorMessage = "Não foi possível coletar a lista de processos. Os detalhes foram gravados no arquivo de log.";
+        Summary = "Indisponível.";
     }
 }
 
 public sealed record ProcessRowViewModel(int Pid, string Name, string Memory, string Cpu)
 {
     public static ProcessRowViewModel From(ProcessUsage p) =>
-        new(p.Pid, p.Name, Display.Bytes(p.WorkingSetBytes), Display.Percent(p.CpuPercent));
+        new(p.Pid, p.Name, PtBr.Bytes(p.WorkingSetBytes), PtBr.Percent(p.CpuPercent));
 }
