@@ -17,7 +17,8 @@ public sealed record MonitorTick(
     MemoryMetrics? Memory,
     HealthStatus MemoryStatus,
     IReadOnlyList<DriveTick> Drives,
-    TimeSpan? Uptime);
+    TimeSpan? Uptime,
+    StorageSnapshot? Storage = null);
 
 /// <summary>
 /// Live monitor loop. It never persists anything: it has no dependency on the history
@@ -101,7 +102,8 @@ public sealed class MonitorService(
             memory,
             thresholds.Memory.Classify(memory is { TotalBytes: > 0 } m ? m.UsagePercent : null),
             drives,
-            uptime);
+            uptime,
+            storage);
     }
 
     private T? Try<T>(string key, Func<T?> collect)

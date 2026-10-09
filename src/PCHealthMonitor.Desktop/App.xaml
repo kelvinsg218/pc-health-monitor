@@ -1,0 +1,17 @@
+<Application x:Class="PCHealthMonitor.Desktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:infra="clr-namespace:PCHealthMonitor.Desktop.Infrastructure"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Dark.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <infra:StatusBrushConverter x:Key="StatusBrush" />
+            <infra:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <infra:NotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
+            <infra:InverseBoolConverter x:Key="InverseBool" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

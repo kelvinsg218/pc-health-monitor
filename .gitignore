@@ -74,3 +74,6 @@ Desktop.ini
 .env.*
 appsettings.*.local.json
 secrets.json
+
+# ---- Release output (distributed through GitHub Releases, not committed) ----
+dist/

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using PCHealthMonitor.Application.Configuration;
 using PCHealthMonitor.Cli.CommandLine;
 using PCHealthMonitor.Cli.Commands;
-using PCHealthMonitor.Cli.Composition;
+using PCHealthMonitor.Infrastructure.Composition;
 using PCHealthMonitor.Cli.Output;
 using PCHealthMonitor.Infrastructure.Persistence;
 

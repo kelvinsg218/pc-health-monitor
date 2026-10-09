@@ -4,6 +4,8 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <!-- References the WPF desktop project (view-model and live-health tests). -->
+    <UseWPF>true</UseWPF>
     <!-- Test method names use underscores for readability. -->
     <NoWarn>$(NoWarn);CA1707;CA1861</NoWarn>
   </PropertyGroup>
@@ -19,11 +21,13 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="System.IO" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PCHealthMonitor.Infrastructure\PCHealthMonitor.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\PCHealthMonitor.Cli\PCHealthMonitor.Cli.csproj" />
+    <ProjectReference Include="..\..\src\PCHealthMonitor.Desktop\PCHealthMonitor.Desktop.csproj" />
   </ItemGroup>
 
 </Project>

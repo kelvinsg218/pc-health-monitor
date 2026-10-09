@@ -4,7 +4,7 @@ using PCHealthMonitor.Application.History;
 using PCHealthMonitor.Application.Monitoring;
 using PCHealthMonitor.Application.Scanning;
 using PCHealthMonitor.Cli.CommandLine;
-using PCHealthMonitor.Cli.Composition;
+using PCHealthMonitor.Infrastructure.Composition;
 using PCHealthMonitor.Cli.Output;
 using PCHealthMonitor.Domain.Health;
 

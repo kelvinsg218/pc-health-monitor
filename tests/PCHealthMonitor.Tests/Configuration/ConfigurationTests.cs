@@ -1,5 +1,5 @@
 using PCHealthMonitor.Application.Configuration;
-using PCHealthMonitor.Cli.Composition;
+using PCHealthMonitor.Infrastructure.Composition;
 using PCHealthMonitor.Domain.Health;
 
 namespace PCHealthMonitor.Tests.Configuration;

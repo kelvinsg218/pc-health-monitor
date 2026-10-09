@@ -11,7 +11,7 @@ using PCHealthMonitor.Infrastructure.Persistence;
 using PCHealthMonitor.Infrastructure.Reports;
 using PCHealthMonitor.Infrastructure.Windows;
 
-namespace PCHealthMonitor.Cli.Composition;
+namespace PCHealthMonitor.Infrastructure.Composition;
 
 /// <summary>
 /// Composition root. Objects are created on demand so that commands which do not need the

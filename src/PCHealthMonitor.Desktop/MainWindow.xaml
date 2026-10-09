@@ -1,0 +1,540 @@
+<Window x:Class="PCHealthMonitor.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:infra="clr-namespace:PCHealthMonitor.Desktop.Infrastructure"
+        Title="{Binding Title}"
+        Icon="pack://application:,,,/Assets/app.ico"
+        Width="1240" Height="820" MinWidth="880" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="{StaticResource UiFont}" FontSize="13"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+
+    <Window.Resources>
+        <!-- Status pill bound to a status label (OK / WARNING / CRITICAL / UNKNOWN / HEALTHY / ATTENTION / INFO) -->
+        <DataTemplate x:Key="PillTemplate">
+            <Border Style="{StaticResource Pill}" Background="{Binding Converter={StaticResource StatusBrush}, ConverterParameter=soft}">
+                <TextBlock Text="{Binding}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Converter={StaticResource StatusBrush}}" />
+            </Border>
+        </DataTemplate>
+
+        <!-- Alert / message row -->
+        <DataTemplate x:Key="MessageTemplate">
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="92" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ContentPresenter Content="{Binding Severity}" ContentTemplate="{StaticResource PillTemplate}" VerticalAlignment="Top" />
+                <TextBlock Grid.Column="1" TextWrapping="Wrap" VerticalAlignment="Center">
+                    <Run Text="{Binding Component, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" /><Run Text=" · " Foreground="{StaticResource MutedBrush}" /><Run Text="{Binding Text, Mode=OneWay}" />
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="Banner" TargetType="Border">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Margin" Value="6,0,6,12" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style x:Key="ErrorBanner" TargetType="Border" BasedOn="{StaticResource Banner}">
+            <Setter Property="Background" Value="#2A1715" />
+            <Setter Property="BorderBrush" Value="{StaticResource CriticalBrush}" />
+        </Style>
+        <Style x:Key="WarnBanner" TargetType="Border" BasedOn="{StaticResource Banner}">
+            <Setter Property="Background" Value="#2A2214" />
+            <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+        </Style>
+
+        <Style x:Key="PageHeader" TargetType="TextBlock" BasedOn="{StaticResource TitleText}">
+            <Setter Property="Margin" Value="6,0,6,4" />
+        </Style>
+        <Style x:Key="PageSub" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+            <Setter Property="Margin" Value="6,0,6,16" />
+        </Style>
+    </Window.Resources>
+
+    <TabControl SelectedIndex="{Binding SelectedTab}" Background="Transparent" BorderThickness="0" Padding="0"
+                ItemContainerStyle="{StaticResource NavTab}">
+        <TabControl.Template>
+            <ControlTemplate TargetType="TabControl">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Sidebar -->
+                    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20,22,12,26">
+                                <Image Source="pack://application:,,,/Assets/app-256.png" Width="34" Height="34" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="PC Health" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Text="Monitor" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" Margin="0,-3,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Bottom" Margin="20,0,16,18">
+                                <TextBlock Text="Read-only diagnostics" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                                <TextBlock Text="Data stays on this computer" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                                <TextBlock Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,6,0,0">
+                                    <Run Text="Version " /><Run Text="{Binding Version, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel IsItemsHost="True" />
+                        </DockPanel>
+                    </Border>
+
+                    <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Column="1" ContentSource="SelectedContent" />
+                </Grid>
+            </ControlTemplate>
+        </TabControl.Template>
+
+        <!-- ===================== DASHBOARD ===================== -->
+        <TabItem Header="Dashboard">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DataContext="{Binding Dashboard}">
+                <StackPanel Margin="22,22,22,22">
+
+                    <!-- Header: machine + overall health -->
+                    <infra:AdaptiveGrid MinItemWidth="380" MaxColumns="2" Margin="0,0,0,10">
+                        <StackPanel Margin="6,0,6,10">
+                            <TextBlock Text="{Binding Machine}" Style="{StaticResource TitleText}" />
+                            <TextBlock Text="{Binding Windows}" Style="{StaticResource MutedText}" Margin="0,2,0,0" />
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0">
+                                <Run Text="Uptime " /><Run Text="{Binding Uptime, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
+                                <Run Text="  ·  Updated " /><Run Text="{Binding LastUpdated, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
+                            </TextBlock>
+                            <TextBlock Text="{Binding RefreshText}" Style="{StaticResource MutedText}" FontSize="11" Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <Border Style="{StaticResource Card}" Margin="6,0"
+                                BorderBrush="{Binding Overall, Converter={StaticResource StatusBrush}}">
+                            <StackPanel>
+                                <TextBlock Text="OVERALL HEALTH (LIVE)" Style="{StaticResource SectionText}" Margin="0,0,0,4" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Overall}" FontSize="26" FontWeight="SemiBold"
+                                               Foreground="{Binding Overall, Converter={StaticResource StatusBrush}}" />
+                                    <TextBlock Text="  incomplete data" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Bottom" Margin="0,0,0,5"
+                                               Visibility="{Binding IsIncomplete, Converter={StaticResource BoolToVisibility}}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding OverallReason}" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </infra:AdaptiveGrid>
+
+                    <!-- Banners -->
+                    <Border Style="{StaticResource WarnBanner}"
+                            Visibility="{Binding DataContext.ConfigurationWarning, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NotEmptyToVisibility}}">
+                        <TextBlock Text="{Binding DataContext.ConfigurationWarning, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="Wrap" />
+                    </Border>
+                    <Border Style="{StaticResource ErrorBanner}" Visibility="{Binding ErrorMessage, Converter={StaticResource NotEmptyToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+                    </Border>
+                    <Border Style="{StaticResource Card}" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="Collecting the first measurements…" Margin="0,0,0,10" />
+                            <ProgressBar IsIndeterminate="{Binding IsLoading, Mode=OneWay}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Main metric cards -->
+                    <infra:AdaptiveGrid MinItemWidth="290" MaxColumns="3">
+                        <!-- CPU -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="CPU" Style="{StaticResource SectionText}" />
+                                    <ContentPresenter Content="{Binding CpuStatus}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                                <TextBlock Text="{Binding CpuValue}" Style="{StaticResource BigValueText}" />
+                                <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Margin="0,8,0,10"
+                                             Foreground="{Binding CpuStatus, Converter={StaticResource StatusBrush}}" />
+                                <infra:Sparkline Values="{Binding CpuSeries}" Height="44" Capacity="60" Stroke="{StaticResource AccentBrush}"
+                                                 ToolTip="CPU usage, last 60 refreshes" />
+                                <TextBlock Text="{Binding CpuModel}" Margin="0,10,0,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding CpuModel}" />
+                                <TextBlock Text="{Binding CpuDetail}" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Memory -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="MEMORY (RAM)" Style="{StaticResource SectionText}" />
+                                    <ContentPresenter Content="{Binding MemoryStatus}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                                <TextBlock Text="{Binding MemoryValue}" Style="{StaticResource BigValueText}" />
+                                <ProgressBar Value="{Binding MemoryPercent, Mode=OneWay}" Maximum="100" Margin="0,8,0,10"
+                                             Foreground="{Binding MemoryStatus, Converter={StaticResource StatusBrush}}" />
+                                <TextBlock Text="{Binding MemoryDetail}" />
+                                <TextBlock Text="{Binding MemorySub}" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Temperature -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="TEMPERATURE" Style="{StaticResource SectionText}" />
+                                    <ContentPresenter Content="{Binding TemperatureStatus}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                                <TextBlock Text="{Binding TemperatureValue}" Style="{StaticResource BigValueText}" />
+                                <TextBlock Text="{Binding TemperatureDetail}" Style="{StaticResource MutedText}" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </infra:AdaptiveGrid>
+
+                    <!-- Storage -->
+                    <TextBlock Text="STORAGE · LOCAL FIXED DRIVES" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
+                    <ItemsControl ItemsSource="{Binding Drives}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <infra:AdaptiveGrid MinItemWidth="290" MaxColumns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource MutedText}" Margin="8,0,0,0" VerticalAlignment="Bottom" />
+                                            </StackPanel>
+                                            <ContentPresenter Content="{Binding Status}" ContentTemplate="{StaticResource PillTemplate}" HorizontalAlignment="Right" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Value}" Style="{StaticResource BigValueText}" FontSize="26" Margin="0,6,0,0" />
+                                        <ProgressBar Value="{Binding Percent, Mode=OneWay}" Maximum="100" Margin="0,6,0,8"
+                                                     Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                                        <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Alerts -->
+                    <TextBlock Text="ALERTS" Style="{StaticResource SectionText}" Margin="6,14,6,2" />
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="No alerts. All monitored components are within the configured thresholds." Foreground="{StaticResource AccentBrush}"
+                                       Visibility="{Binding Alerts.Count, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}" />
+                            <ItemsControl ItemsSource="{Binding Alerts}" ItemTemplate="{StaticResource MessageTemplate}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Notes -->
+                    <TextBlock Text="NOTES" Style="{StaticResource SectionText}" Margin="6,14,6,2"
+                               Visibility="{Binding Notes.Count, Converter={StaticResource NotEmptyToVisibility}}" />
+                    <Border Style="{StaticResource Card}" Visibility="{Binding Notes.Count, Converter={StaticResource NotEmptyToVisibility}}">
+                        <ItemsControl ItemsSource="{Binding Notes}" ItemTemplate="{StaticResource MessageTemplate}" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- ===================== PROCESSES ===================== -->
+        <TabItem Header="Processes">
+            <Grid Margin="22" DataContext="{Binding Processes}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <TextBlock Text="Top processes" Style="{StaticResource PageHeader}" />
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}" Margin="6,0" />
+                </Grid>
+                <TextBlock Grid.Row="1" Text="{Binding Summary}" Style="{StaticResource PageSub}" />
+                <StackPanel Grid.Row="2">
+                    <ProgressBar IsIndeterminate="{Binding IsBusy, Mode=OneWay}" Margin="6,0,6,12" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    <Border Style="{StaticResource ErrorBanner}" Visibility="{Binding ErrorMessage, Converter={StaticResource NotEmptyToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="BY MEMORY (WORKING SET)" Style="{StaticResource SectionText}" />
+                            <DataGrid ItemsSource="{Binding TopMemory}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="70" />
+                                    <DataGridTextColumn Header="PROCESS" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="MEMORY" Binding="{Binding Memory}" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="BY CPU (% OF TOTAL CPU CAPACITY)" Style="{StaticResource SectionText}" />
+                            <DataGrid ItemsSource="{Binding TopCpu}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="70" />
+                                    <DataGridTextColumn Header="PROCESS" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="CPU" Binding="{Binding Cpu}" Width="80" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </TabItem>
+
+        <!-- ===================== FULL SCAN ===================== -->
+        <TabItem Header="Full scan">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DataContext="{Binding Scan}">
+                <StackPanel Margin="22">
+                    <TextBlock Text="Full scan" Style="{StaticResource PageHeader}" />
+                    <TextBlock Text="{Binding Description}" Style="{StaticResource PageSub}" />
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <WrapPanel>
+                                <Button Content="Run full scan" AutomationProperties.AutomationId="RunScanButton" Command="{Binding RunCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,10,6" />
+                                <Button Content="Cancel" AutomationProperties.AutomationId="CancelScanButton" Command="{Binding CancelCommand}" Margin="0,0,18,6" />
+                                <CheckBox Content="Also generate a report (JSON + TXT)" IsChecked="{Binding GenerateReport}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                          IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBool}}" />
+                            </WrapPanel>
+                            <ProgressBar IsIndeterminate="{Binding IsRunning, Mode=OneWay}" Margin="0,10,0,0" Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}" />
+                            <TextBlock Text="{Binding ProgressText}" Style="{StaticResource MutedText}" Margin="0,8,0,0"
+                                       Visibility="{Binding ProgressText, Converter={StaticResource NotEmptyToVisibility}}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource ErrorBanner}" Margin="6,12,6,0" Visibility="{Binding ErrorMessage, Converter={StaticResource NotEmptyToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+                    </Border>
+
+                    <StackPanel Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}" Margin="0,12,0,0">
+                        <Border Style="{StaticResource Card}" BorderBrush="{Binding Overall, Converter={StaticResource StatusBrush}}">
+                            <StackPanel>
+                                <TextBlock Text="RESULT" Style="{StaticResource SectionText}" />
+                                <TextBlock Text="{Binding Overall}" FontSize="26" FontWeight="SemiBold" Foreground="{Binding Overall, Converter={StaticResource StatusBrush}}" />
+                                <TextBlock Text="{Binding ResultHeader}" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding SavedText}" Margin="0,8,0,0" Visibility="{Binding SavedText, Converter={StaticResource NotEmptyToVisibility}}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Visibility="{Binding ReportPath, Converter={StaticResource NotEmptyToVisibility}}">
+                                    <TextBlock Text="{Binding ReportPath}" Style="{StaticResource MutedText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="620" />
+                                    <Button Content="Open report folder" Command="{Binding OpenReportsCommand}" Margin="12,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="COMPONENTS" Style="{StaticResource SectionText}" />
+                                <DataGrid ItemsSource="{Binding Components}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="COMPONENT" Binding="{Binding Name}" Width="150" />
+                                        <DataGridTemplateColumn Header="STATUS" Width="110">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ContentPresenter Content="{Binding Status}" ContentTemplate="{StaticResource PillTemplate}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="EVIDENCE" Binding="{Binding Value}" Width="*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="DIAGNOSTIC MESSAGES" Style="{StaticResource SectionText}" />
+                                <ItemsControl ItemsSource="{Binding Messages}" ItemTemplate="{StaticResource MessageTemplate}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Visibility="{Binding ComparisonHeader, Converter={StaticResource NotEmptyToVisibility}}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding ComparisonHeader}" Style="{StaticResource SectionText}" TextWrapping="Wrap" />
+                                <DataGrid ItemsSource="{Binding Changes}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="METRIC" Binding="{Binding Metric}" Width="*" />
+                                        <DataGridTextColumn Header="PREVIOUS" Binding="{Binding Previous}" Width="110" />
+                                        <DataGridTextColumn Header="CURRENT" Binding="{Binding Current}" Width="110" />
+                                        <DataGridTextColumn Header="CHANGE" Binding="{Binding Change}" Width="2*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- ===================== HISTORY ===================== -->
+        <TabItem Header="History">
+            <Grid Margin="22" DataContext="{Binding History}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <TextBlock Text="History" Style="{StaticResource PageHeader}" />
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}" HorizontalAlignment="Right" Margin="6,0" />
+                </Grid>
+                <TextBlock Grid.Row="1" Text="{Binding Summary}" Style="{StaticResource PageSub}" />
+                <StackPanel Grid.Row="2">
+                    <ProgressBar IsIndeterminate="{Binding IsBusy, Mode=OneWay}" Margin="6,0,6,12" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    <Border Style="{StaticResource ErrorBanner}" Visibility="{Binding ErrorMessage, Converter={StaticResource NotEmptyToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*" MinWidth="380" />
+                        <ColumnDefinition Width="2*" MinWidth="280" />
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <DataGrid ItemsSource="{Binding Scans}" SelectedItem="{Binding Selected}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="0.5*" MinWidth="36" />
+                                <DataGridTextColumn Header="DATE" Binding="{Binding Date}" Width="1.8*" MinWidth="122" />
+                                <DataGridTextColumn Header="CPU AVG" Binding="{Binding CpuAverage}" Width="*" MinWidth="64" />
+                                <DataGridTextColumn Header="PEAK" Binding="{Binding CpuPeak}" Width="*" MinWidth="58" />
+                                <DataGridTextColumn Header="MEMORY" Binding="{Binding Memory}" Width="*" MinWidth="66" />
+                                <DataGridTextColumn Header="DISK MAX" Binding="{Binding DiskMax}" Width="1.3*" MinWidth="80" />
+                                <DataGridTemplateColumn Header="HEALTH" Width="1.4*" MinWidth="98">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ContentPresenter Content="{Binding Health}" ContentTemplate="{StaticResource PillTemplate}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <TextBlock Text="Select a scan to see its details." Style="{StaticResource MutedText}"
+                                           Visibility="{Binding DetailHeader, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}" />
+                                <TextBlock Text="{Binding DetailHeader}" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,0,0,10" />
+                                <ItemsControl ItemsSource="{Binding Details}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100" />
+                                                    <ColumnDefinition Width="96" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" />
+                                                <ContentPresenter Grid.Column="1" Content="{Binding Status}" ContentTemplate="{StaticResource PillTemplate}" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Value}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="MESSAGES" Style="{StaticResource SectionText}" Margin="0,14,0,4"
+                                           Visibility="{Binding Messages.Count, Converter={StaticResource NotEmptyToVisibility}}" />
+                                <ItemsControl ItemsSource="{Binding Messages}" ItemTemplate="{StaticResource MessageTemplate}" />
+                                <TextBlock Text="{Binding ComparisonHeader}" Style="{StaticResource SectionText}" TextWrapping="Wrap" Margin="0,14,0,4"
+                                           Visibility="{Binding ComparisonHeader, Converter={StaticResource NotEmptyToVisibility}}" />
+                                <ItemsControl ItemsSource="{Binding Changes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="130" />
+                                                    <ColumnDefinition Width="140" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Metric}" Foreground="{StaticResource MutedBrush}" />
+                                                <TextBlock Grid.Column="1">
+                                                    <Run Text="{Binding Previous, Mode=OneWay}" /><Run Text=" → " Foreground="{StaticResource MutedBrush}" /><Run Text="{Binding Current, Mode=OneWay}" />
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" Text="{Binding Change}" TextWrapping="Wrap" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+        </TabItem>
+
+        <!-- ===================== ABOUT ===================== -->
+        <TabItem Header="About">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="22" MaxWidth="900" HorizontalAlignment="Left">
+                    <TextBlock Text="About PC Health Monitor" Style="{StaticResource PageHeader}" />
+                    <TextBlock Style="{StaticResource PageSub}">
+                        <Run Text="Version " /><Run Text="{Binding Version, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding RuntimeText, Mode=OneWay}" />
+                    </TextBlock>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="WHAT THIS APP DOES" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="Reads CPU, memory, local drive and (when Windows exposes it) temperature information, classifies each component as OK, WARNING, CRITICAL or UNKNOWN using the thresholds below, and keeps a local history of full scans so you can see how this computer changes over time." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource MutedBrush}"
+                                       Text="It is a read-only diagnostic tool: it never changes settings, never ends or modifies processes, never deletes files and never asks for administrator rights. Maintenance decisions are left to you." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="THRESHOLDS (WARNING / CRITICAL)" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding ThresholdsText}" TextWrapping="Wrap" />
+                            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Style="{StaticResource MutedText}"
+                                       Text="UNKNOWN means a metric could not be read; it never makes the overall result worse by itself. Optional settings: place an appsettings.json file next to PCHealthMonitor.exe (see the README)." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="PRIVACY AND LOCAL DATA" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="Nothing is sent over the network. Scans, reports and logs are stored only on this computer, for your Windows user:" />
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="History" Foreground="{StaticResource MutedBrush}" />
+                                <TextBox Grid.Column="1" Text="{Binding DatabaseFile, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+                                <TextBlock Grid.Row="1" Text="Reports" Foreground="{StaticResource MutedBrush}" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ReportsFolder, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+                                <TextBlock Grid.Row="2" Text="Logs" Foreground="{StaticResource MutedBrush}" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LogsFolder, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+                            </Grid>
+                            <WrapPanel Margin="0,12,0,0">
+                                <Button Content="Open data folder" Command="{Binding OpenDataFolderCommand}" Margin="0,0,10,0" />
+                                <Button Content="Open logs folder" Command="{Binding OpenLogsFolderCommand}" />
+                            </WrapPanel>
+                            <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Style="{StaticResource MutedText}"
+                                       Text="To remove all data, close the app and delete the data folder. The app installs nothing and does not start with Windows." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="KNOWN LIMITATIONS" Style="{StaticResource SectionText}" />
+                            <TextBlock TextWrapping="Wrap" Text="• Temperature comes only from firmware (ACPI) thermal zones exposed by Windows. A thermal zone is not necessarily the CPU core sensor, and many computers expose none — then it is shown as Unavailable. Values are never estimated." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• CPU usage is time-based; Task Manager shows “processor utility”, which also considers clock frequency, so values can differ slightly." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• Process memory is the working set (includes shared pages); Task Manager shows the private working set by default." />
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="• Disk physical health (SMART), GPU, battery and network are not evaluated in this version." />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</Window>

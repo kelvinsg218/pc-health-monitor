@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- WinExe: graphical application, no console window. -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>PCHealthMonitor</AssemblyName>
+    <RootNamespace>PCHealthMonitor.Desktop</RootNamespace>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Required by source-generated [LibraryImport] P/Invoke stubs. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyTitle>PC Health Monitor</AssemblyTitle>
+    <Description>Read-only health diagnostics for Windows 10/11.</Description>
+    <Copyright>PC Health Monitor contributors</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PCHealthMonitor.Infrastructure\PCHealthMonitor.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\app-256.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PCHealthMonitor.Tests" />
+  </ItemGroup>
+
+</Project>

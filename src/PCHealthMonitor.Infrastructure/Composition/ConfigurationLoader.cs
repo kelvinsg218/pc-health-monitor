@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using PCHealthMonitor.Application.Configuration;
 
-namespace PCHealthMonitor.Cli.Composition;
+namespace PCHealthMonitor.Infrastructure.Composition;
 
 /// <summary>
 /// Loads settings from appsettings.json (next to the executable, optional) and environment

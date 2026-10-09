@@ -8,6 +8,7 @@ namespace PCHealthMonitor.Infrastructure.Persistence;
 /// <summary>Creates the data directory and applies EF Core migrations on first use.</summary>
 public sealed class PcHealthDatabase(string databasePath, ILogger<PcHealthDatabase> logger)
 {
+    private readonly object _initLock = new();
     private bool _initialized;
 
     public string DatabasePath { get; } = Path.GetFullPath(databasePath);
@@ -22,6 +23,14 @@ public sealed class PcHealthDatabase(string databasePath, ILogger<PcHealthDataba
     /// <summary>Idempotent: ensures the directory exists and the schema is up to date.</summary>
     /// <exception cref="PersistenceException">The database could not be created or migrated.</exception>
     public void EnsureInitialized()
+    {
+        lock (_initLock)
+        {
+            EnsureInitializedCore();
+        }
+    }
+
+    private void EnsureInitializedCore()
     {
         if (_initialized)
         {
